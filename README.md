@@ -1,1 +1,1 @@
-# Azure_VMSS
+This is simple Azure VMSS Creation for Azure Devops Pipeline run solution

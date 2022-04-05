@@ -1,0 +1,89 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"adminPassword": {
+			"type": "SecureString",
+			"metadata": {
+				"description": "Secure adminPassword"
+			}
+		},
+		"vnetPrefix":{
+			"type": "string",
+            "metadata": {
+                "description": "Provide subnet prefix"
+            },
+			"defaultValue": "snet-wng-devops-qa-westeu-001"
+		}
+	},
+	"variables": {},
+	"resources": [
+		{
+			"type": "Microsoft.Compute/virtualMachineScaleSets",
+			"apiVersion": "2021-07-01",
+			"name": "vmss-wng-devops-agent-westeu-002",
+			"location": "westeurope",
+			"dependsOn": [],
+			"tags": {},
+			"sku": {
+				"name": "Standard_A2m_v2",
+				"capacity": 1
+			},
+			"properties": {
+				"overprovision": false,
+				"upgradePolicy": {
+					"mode": "Manual",
+					"rollingUpgradePolicy": {}
+				},
+				"singlePlacementGroup": false,
+				"platformFaultDomainCount": 1,
+				"virtualMachineProfile": {
+					"storageProfile": {
+						"osDisk": {
+							"createOption": "FromImage",
+							"caching": "ReadWrite",
+							"managedDisk": {
+								"storageAccountType": "StandardSSD_LRS"
+							}
+						},
+						"imageReference": {
+							"id": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Compute/images/updated-scaleset-windowsimg-003"
+						}
+					},
+					"osProfile": {
+						// "computerNamePrefix": "vmss",
+						"adminUsername": "AzDevOps",
+						"adminPassword": "[parameters('adminPassword')]"
+					},
+					"networkProfile": {
+						"networkInterfaceConfigurations": [
+							{
+								"name": "vmssw9a04Nic",
+								"properties": {
+									"ipConfigurations": [
+										{
+											"name": "vmssw9a04IPConfig",
+											"properties": {
+												"subnet": {
+													"id": "[concat('/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Network/virtualNetworks/vnet-wng-devops-westeu-001/subnets/', parameters('vnetPrefix'))]"
+												}
+											}
+										}
+									],
+									"primary": "true"
+								}
+							}
+						]
+					}
+				},
+				"orchestrationMode": "Uniform"
+			}
+		}
+	],
+	"outputs": {
+		"VMSS": {
+			"type": "Object",
+			"value": "[reference(resourceId('Microsoft.Compute/virtualMachineScaleSets', 'vmss-wng-devops-agent-westeu-002'),providers('Microsoft.Compute', 'virtualMachineScaleSets').apiVersions[0])]"
+		}
+	}
+}

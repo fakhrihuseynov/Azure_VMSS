@@ -1,0 +1,27 @@
+# # Sysprep VM from Windows
+C:\Windows\System32\sysprep\sysprep.exe /generalize /oobe /shutdown
+# # Deallocate VM with AZ Cli
+az vm deallocate --resource-group rg-wng-devops-westeu-001 --name vm-agent-devops-westeu-001
+# # Generalize VM with AZ Cli
+az vm generalize --resource-group rg-wng-devops-westeu-001 --name vm-agent-devops-westeu-001
+# # Create a new image with imagecreate.json
+
+# # Create VMSS cluster with the following command
+
+
+az vmss create \
+--name vmss-wng-devops-agent-westeu-001 \
+--resource-group rg-wng-devops-westeu-001 \
+--image updated-scaleset-windowsimg-002 \
+--vm-sku Standard_A2m_v2 \
+--storage-sku StandardSSD_LRS \
+--authentication-type password \
+--instance-count 1 \
+--disable-overprovision \
+--upgrade-policy-mode manual \
+--single-placement-group false \
+--platform-fault-domain-count 1 \
+--admin-username AzDevOps \
+--vnet-name vnet-wng-devops-westeu-001 \
+--vnet-address-prefix snet-wng-devops-qa-westeu-001 \
+--load-balancer ""

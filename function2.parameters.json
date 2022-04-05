@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workloadName": {
+            "value": "wng"
+        },
+        "environment": {
+            "value": "demo2"
+        },
+        "region": {
+            "value": "westeu"
+        },
+        "appName":{
+            "value": "testing"
+        },
+        "userManagedClientId":{
+            "value": "651ec4ff-186f-4297-8129-a767e3d5f4b1"
+        },
+        "userManagedIdentityId":{
+            "value": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-demo2-westeu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-wng-demo2-westeu-001"
+        },
+        "appconfigEndpoint":{
+            "value": "https://apc-wng-demo2-westeu-001.azconfig.io"
+        },
+        "hostingPlanResourceID":{
+            "value": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-demo2-westeu-001/providers/Microsoft.Web/serverFarms/asp-wng-demo2-be-westeu-001"
+        },
+        "hostingEnvironmentProfile":{
+            "value": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-demo2-westeu-001/providers/Microsoft.Web/hostingEnvironments/ase-wng-demo2-be-westeu-001"
+        },
+        "deploymentSlotName":{
+            "value": "staging"
+        },
+        "appiInstrumentationKey":{
+            "value": "f1b683f4-b20e-440c-a019-2a865b3e90e2"
+        },
+        "appiConnectionString":{
+            "value": "InstrumentationKey=f1b683f4-b20e-440c-a019-2a865b3e90e2;IngestionEndpoint=https://westeurope-1.in.applicationinsights.azure.com/"
+        },
+        "keyVaultName":{
+            "value": "kv-wng-demo2-westeu-001"
+        },
+        "keyVaultSiteUri":{
+            "value": "https://kv-wng-demo2-westeu-001.vault.azure.net/"
+        },
+        "storageConnectionStringName":{
+            "value": "stwngdemo2bewesteu001Connectionstring"
+        },
+        "storageName":{
+            "value": "stwngdemo2bewesteu001"
+        },
+        "index":{
+            "value": "000003"
+        },
+        "apimName":{
+            "value": "api-wng-demo2-westeu-001"
+        }
+    }
+}

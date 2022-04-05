@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "imageName": {
+            "defaultValue": "updated-scaleset-windowsimg-003",
+            "type": "String"
+        },
+        "virtualMachineId": {
+            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/RG-WNG-DEVOPS-WESTEU-001/providers/Microsoft.Compute/virtualMachines/vm-agent-devops-westeu-001",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/images",
+            "apiVersion": "2021-03-01",
+            "name": "[parameters('imageName')]",
+            "location": "westeurope",
+            "properties": {
+                "sourceVirtualMachine": {
+                    "id": "[parameters('virtualMachineId')]"
+                },
+                "storageProfile": {},
+                "hyperVGeneration": "V1"
+            }
+        }
+        // {
+        //     "name": "windowsVM1/customScript1",
+        //     "type": "Microsoft.Compute/virtualMachines/extensions",
+        //     "apiVersion": "2019-07-01",
+        //     "location": "[resourceGroup().location]",
+        //     "tags": {
+        //         "displayName": "customScript1 for Windows VM"
+        //     },
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Compute/virtualMachines', 'windowsVM1')]"
+        //     ],
+        //     "properties": {
+        //         "publisher": "Microsoft.Compute",
+        //         "type": "CustomScriptExtension",
+        //         "typeHandlerVersion": "1.10",
+        //         "autoUpgradeMinorVersion": true,
+        //         "settings": {
+        //             "fileUris": [
+        //                 "[concat('artifactsLocation', '/scripts/customScript.ps1', 'artifactsLocationSasToken')]"
+        //             ]
+        //         },
+        //         "protectedSettings": {
+        //             "commandToExecute": "powershell -ExecutionPolicy Bypass -file customScript.ps1"
+        //         }
+        //     }
+        // }
+    ]
+}

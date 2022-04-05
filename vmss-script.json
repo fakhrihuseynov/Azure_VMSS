@@ -1,0 +1,264 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmssName": {
+            "type": "string",
+            "defaultValue": "vmss-wng-devops-agent-westeu-001"
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "vmssagent"
+        },
+        "imageId": {
+            "type": "string",
+            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Compute/images/new-scaleset-windowsimg-1"
+        },
+        "diskId": {
+            "type": "string",
+            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/RG-WNG-DEVOPS-WESTEU-001/providers/Microsoft.Compute/disks/disk-scale-001"
+        },
+        "hostName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "vnet-wng-devops-westeu-001"
+        },
+        "userName": {
+            "type": "string",
+            "defaultValue": "AzDevOps"
+        },
+        "userPass": {
+            "type": "string",
+            "defaultValue": "R5KYS]M>hZvQQD8\\"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('vmssName')]",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2021-03-01",
+            "location": "westeurope",
+            "sku": {
+                "name": "Standard_D2s_v4",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "properties": {
+                "singlePlacementGroup": false,
+                "upgradePolicy": {
+                    "mode": "Automatic",
+                    "rollingUpgradePolicy": {
+                        "maxBatchInstancePercent": 20,
+                        "maxUnhealthyInstancePercent": 20,
+                        "maxUnhealthyUpgradedInstancePercent": 20,
+                        "pauseTimeBetweenBatches": "PT0S"
+                    },
+                    "automaticOSUpgradePolicy": {
+                        "enableAutomaticOSUpgrade": false,
+                        "disableAutomaticRollback": false
+                    }
+                },
+                "virtualMachineProfile": {
+                    "osProfile": {
+                        "computerNamePrefix": "[parameters('hostName')]",
+                        "adminUsername": "[parameters('userName')]",
+                        "windowsConfiguration": {
+                            "provisionVMAgent": true,
+                            "enableAutomaticUpdates": true
+                        },
+                        "secrets": []
+                    },
+                    "storageProfile": {
+                        "osDisk": {
+                            "osType": "Windows",
+                            "createOption": "FromImage",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "StandardSSD_LRS"
+                            },
+                            "diskSizeGB": 128
+                        },
+                        "imageReference": {
+                            "id": "[parameters('imageId')]"
+                        }
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "vmssw9a04Nic",
+                                "properties": {
+                                    "primary": true,
+                                    "enableAcceleratedNetworking": false,
+                                    "dnsSettings": {
+                                        "dnsServers": []
+                                    },
+                                    "enableIPForwarding": false,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "vmssw9a04IPConfig",
+                                            "properties": {
+                                                "subnet": {
+                                                    "id": "[concat(parameters('vnetName'), '/subnets/snet-wng-devops-qa-westeu-001')]"
+                                                },
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "Microsoft.Azure.DevOps.Pipelines.Agent",
+                                "properties": {
+                                    "autoUpgradeMinorVersion": false,
+                                    "publisher": "Microsoft.VisualStudio.Services",
+                                    "type": "TeamServicesAgent",
+                                    "typeHandlerVersion": "1.27",
+                                    "settings": {
+                                        "isPipelinesAgent": true,
+                                        "agentFolder": "C:\\agent",
+                                        "agentDownloadUrl": "https://vstsagentpackage.azureedge.net/agent/2.193.0/vsts-agent-win-x64-2.193.0.zip",
+                                        "enableScriptDownloadUrl": "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Windows/11/enableagent.ps1"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "licenseType": "None"
+                },
+                "overprovision": false,
+                "doNotRunExtensionsOnOverprovisionedVMs": false,
+                "platformFaultDomainCount": 1
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "name": "[concat(parameters('vmssName'), '/', parameters('vmName'))]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]"
+            ],
+            "sku": {
+                "name": "Standard D2s_v4",
+                "tier": "Standard"
+            },
+            "properties": {
+                "networkProfileConfiguration": {
+                    "networkInterfaceConfigurations": [
+                        {
+                            "name": "[concat(parameters('vmName'), '-nic')]",
+                            "properties": {
+                                "primary": true,
+                                "enableAcceleratedNetworking": false,
+                                "dnsSettings": {
+                                    "dnsServers": []
+                                },
+                                "enableIPForwarding": false,
+                                "ipConfigurations": [
+                                    {
+                                        "name": "[concat(parameters('vmName'), '-conf')]",
+                                        "properties": {
+                                            "subnet": {
+                                                "id": "[concat(parameters('vnetName'), '/subnets/snet-wng-devops-qa-westeu-001')]"
+                                            },
+                                            "privateIPAddressVersion": "IPv4"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "hardwareProfile": {},
+                "storageProfile": {
+                    "imageReference": {
+                        "id": "[parameters('imageId')]"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "disk-scale-001",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS",
+                            "id": "[parameters('diskId')]"
+                        },
+                        "diskSizeGB": 128
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('hostName')]",
+                    "adminUsername": "[parameters('userName')]",
+                    "adminPassword": "[parameters('userPass')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[concat(resourceId('Microsoft.Compute/virtualMachineScaleSets/virtualMachines', parameters('vmssName'), parameters('vmName')), '/networkInterfaces/vmssw9a04Nic')]"
+                        }
+                    ]
+                },
+                "licenseType": "None"
+            }
+        },
+        {
+            "name": "[concat(parameters('vmName'), '/customScript')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "customScript1 for Windows VM"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": ""
+                },
+                "settings": {
+                    "commandToExecute": "SHUTDOWN -r -t 10"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
+            "apiVersion": "2021-03-01",
+            "name": "[concat(parameters('vmssName'), '/Microsoft.Azure.DevOps.Pipelines.Agent')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]"
+            ],
+            "properties": {
+                "provisioningState": "Succeeded",
+                "autoUpgradeMinorVersion": false,
+                "publisher": "Microsoft.VisualStudio.Services",
+                "type": "TeamServicesAgent",
+                "typeHandlerVersion": "1.27",
+                "settings": {
+                    "isPipelinesAgent": true,
+                    "agentFolder": "C:\\agent",
+                    "agentDownloadUrl": "https://vstsagentpackage.azureedge.net/agent/2.193.0/vsts-agent-win-x64-2.193.0.zip",
+                    "enableScriptDownloadUrl": "https://vstsagenttools.blob.core.windows.net/tools/ElasticPools/Windows/11/enableagent.ps1"
+                }
+            }
+        }
+
+    ]
+}
