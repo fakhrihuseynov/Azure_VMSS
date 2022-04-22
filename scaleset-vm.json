@@ -4,11 +4,11 @@
     "parameters": {
         "virtualMachineName": {
             "type": "string",
-            "defaultValue": "vm-wng-devops-winagent-westeu-001"
+            "defaultValue": "vm-devops-windows-westeu-001"
         },
         "virtualMachineSize": {
             "type": "string",
-            "defaultValue": "Standard_D2s_v4"
+            "defaultValue": "Standard_D2as_v5" //"Standard_D2s_v4"
         },
         "location": {
             "type": "string",
@@ -16,27 +16,34 @@
         },
         "networkInterfaceName": {
             "type": "string",
-            "defaultValue": "nic-wng-devops-scale-westeu-001"
+            "defaultValue": "nic-devops-west-001"
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "snet-wng-devops-qa-westeu-001"
+            "defaultValue": "snet-devops-westeu-001"
         },
         "networkSecurityGroupId": {
             "type": "string",
-            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Network/networkSecurityGroups/vm-wng-devops-scale-westeu-001-nsg"
+            "defaultValue": "/subscriptions/767608de-22d6-4173-b063-f84df775d6ef/resourceGroups/rg-devops-westeu-001/providers/Microsoft.Network/networkSecurityGroups/nsg-devops-westeu-001"
         },
         "virtualNetworkId": {
             "type": "string",
-            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Network/virtualNetworks/vnet-wng-devops-westeu-001"
+            "defaultValue": "/subscriptions/767608de-22d6-4173-b063-f84df775d6ef/resourceGroups/rg-devops-westeu-001/providers/Microsoft.Network/virtualNetworks/vnet-devops-westeu-001"
         },
-        "publicIpAddressId": {
-            "type": "string",
-            "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Network/publicIPAddresses/vm-wng-devops-scale-westeu-001-ip"
-        },
+        // "publicIpAddressId": {
+        //     "type": "string",
+        //     "defaultValue": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Network/publicIPAddresses/vm-wng-devops-scale-westeu-001-ip"
+        // },
         "adminUsername": {
             "type": "string",
-            "defaultValue": "epam_admin"
+            "defaultValue": "atos_admin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Here is you secure password for access"
+            },
+            "defaultValue": "P@ss12345@!"
         }
     },
     "variables": {
@@ -79,13 +86,31 @@
                 "hardwareProfile": {
                     "vmSize": "[parameters('virtualMachineSize')]"
                 },
+                // "storageProfile": {
+                //     "osDisk": {
+                //         "createOption": "Attach",
+                //         "managedDisk": {
+                //             "id": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Compute/disks/disk-scale-002"
+                //         },
+                //         "osType": "Windows"
+                //     }
+                // },
+                 "osProfile": {
+                    "computerName": "windowsVM1",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
                 "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2012-R2-Datacenter",
+                        "version": "latest"
+                    },
                     "osDisk": {
-                        "createOption": "Attach",
-                        "managedDisk": {
-                            "id": "/subscriptions/a3198410-d895-40f4-b6bf-a898a6fe4021/resourceGroups/rg-wng-devops-westeu-001/providers/Microsoft.Compute/disks/disk-scale-002"
-                        },
-                        "osType": "Windows"
+                        "name": "windowsVM1OSDisk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
                     }
                 },
                 "networkProfile": {
