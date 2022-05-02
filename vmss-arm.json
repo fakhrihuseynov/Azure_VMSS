@@ -5,7 +5,7 @@
 		"adminPassword": {
 			"type": "SecureString",
 			"metadata": {
-				"description": "Secure adminPassword"
+				"description": "Secure aksjdhaskljdhas;lhdalskfdalkshdsad"
 			}
 		},
 		"vnetPrefix":{
